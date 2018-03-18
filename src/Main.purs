@@ -17,11 +17,11 @@ import Halogen.HTML.Events as HE
 import Halogen.VDom.Driver (runUI)
 
 
-type State = { on :: Boolean
-             , count :: Int }
+type State = { count :: Int }
 
 
-data Query a = ToggleState a
+data Query a = Increment a
+             | Decrement a
 
 
 data MyAlgebra a = Log String a
@@ -43,7 +43,7 @@ ui =
   where
 
   initialState :: State
-  initialState = { on: false, count: 0 }
+  initialState = { count: 0 }
 
   render :: State -> H.ComponentHTML Query
   render state =
@@ -51,16 +51,24 @@ ui =
       [ HH.h1_
           [ HH.text "Toggle Button" ]
       , HH.button
-          [ HE.onClick (HE.input_ ToggleState) ]
-          [ HH.text (if state.on then "On" else "Off") ]
+          [ HE.onClick (HE.input_ Increment) ]
+          [ HH.text "+" ]
       , HH.text $ show state.count
+      , HH.button
+        [ HE.onClick (HE.input_ Decrement) ]
+        [ HH.text "-" ]
       ]
 
   eval :: Query ~> H.ComponentDSL State Query Void MyMonad
-  eval (ToggleState next) = do
-    H.modify (\state -> { on: not state.on, count: state.count + 1 })
-    H.lift $ output "State was toggled"
+  eval (Increment next) = do
+    H.modify (\state -> { count: state.count + 1 })
+    H.lift $ output "State was incremented"
     pure next
+  eval (Decrement next) = do
+    H.modify (\state -> { count: state.count - 1 })
+    H.lift $ output "State was decremented"
+    pure next
+
 
 
 ui' :: forall eff. H.Component HH.HTML Query Unit Void (Aff (HA.HalogenEffects (console :: CONSOLE | eff)))

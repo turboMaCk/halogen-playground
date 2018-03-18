@@ -19,11 +19,16 @@ data Query a = Increment a
 
 
 data MyAlgebra a = Log String a
+                 | NoOp a
+
 type MyMonad = Free MyAlgebra
 
 
 output :: String -> MyMonad Unit
 output msg = liftF (Log msg unit)
+
+noOp :: MyMonad Unit
+noOp = liftF (NoOp unit)
 
 
 ui :: H.Component HH.HTML Query Unit Void MyMonad

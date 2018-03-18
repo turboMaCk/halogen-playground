@@ -21,9 +21,8 @@ ui' :: forall eff. H.Component HH.HTML Counter.Query Unit Void (Aff (HalogenEffe
 ui' = H.hoist (foldFree evalMyAlgebra) Counter.ui
   where
   evalMyAlgebra :: Counter.MyAlgebra ~> Aff (HA.HalogenEffects (console :: CONSOLE | eff))
-  evalMyAlgebra (Counter.Log msg next) = do
-    log msg
-    pure next
+  evalMyAlgebra (Counter.NoOp next) = pure next
+  evalMyAlgebra (Counter.Log msg next) = log msg *> pure next
 
 
 main :: Eff (HalogenEffects (console :: CONSOLE)) Unit
